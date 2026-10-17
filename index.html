@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ردیاب هدف</title>
+<meta name="theme-color" content="#F3F8FF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ردیاب هدف">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px)}
+/* Layout concept: one-column mobile app, hologram progress hero on top, goal cards below, bottom tab bar with a central record button. */
+:root{
+  --font:'Vazirmatn','Segoe UI',Tahoma,system-ui,sans-serif;
+  --bg:#F3F8FF;--card:#FFFFFF;--ink:#12203A;--sub:#5B6B88;
+  --a:#2F7BEA;--b:#7C5CFA;--c:#22C6D8;--soft:#D6E6FF;--tag:#E3EEFF;--on-a:#FFFFFF;
+  --line:rgba(18,32,58,.10);--good:#0E8F63;--warn:#B25E09;--bad:#C93A3A;--scrim:rgba(18,32,58,.45);
+  color-scheme:light;
+}
+:root[data-app="mint"]{--bg:#F1FAF6;--ink:#0F2D26;--sub:#4F7068;--a:#0E8A6B;--b:#2BB6C9;--c:#8BD96B;--soft:#CDEFE3;--tag:#DDF4EA;--line:rgba(15,45,38,.10);--scrim:rgba(15,45,38,.45)}
+:root[data-app="gold"]{--bg:#FFF8EE;--ink:#3A2812;--sub:#7A5F3B;--a:#B7700A;--b:#E0563C;--c:#E9B949;--soft:#FBE3B8;--tag:#FDEBCB;--line:rgba(58,40,18,.12);--scrim:rgba(58,40,18,.45)}
+:root[data-app="pearl"]{--bg:#F8F4FF;--ink:#2A1B4A;--sub:#766797;--a:#7C4DEB;--b:#E05BA6;--c:#4C9BF0;--soft:#E6DAFD;--tag:#EEE5FF;--line:rgba(42,27,74,.10);--scrim:rgba(42,27,74,.45)}
+:root[data-app="night"]{--bg:#0E1322;--card:#171E35;--ink:#EAF0FF;--sub:#9AA8C7;--a:#5B9BFF;--b:#9B7BFF;--c:#3DD6E6;--soft:#2A3558;--tag:#222B49;--on-a:#0B1020;--line:rgba(255,255,255,.10);--good:#3DD6A0;--warn:#F0B35A;--bad:#FF7A7A;--scrim:rgba(0,0,0,.6);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.7;
+  padding-block:12px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  min-height:100%;-webkit-text-size-adjust:100%}
+body.lock{overflow:hidden}
+.wrap{max-width:520px;margin:0 auto}
+h1,h2,h3,p{margin:0}
+h1{font-size:22px;font-weight:800}
+h2{font-size:16px;font-weight:700}
+.sub{color:var(--sub);font-size:13px}
+.num{font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.top .tools{display:flex;gap:8px;flex:none}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:500}
+.dot{width:14px;height:14px;border-radius:50%;background:conic-gradient(var(--a),var(--b),var(--c),var(--a))}
+.banner{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--tag);border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.banner button{background:var(--a);color:var(--on-a);border-radius:10px;padding:5px 12px;font-size:13px;font-weight:700;flex:none}
+.banner.warn{background:color-mix(in srgb,var(--warn) 14%,var(--card))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.hero{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.holo{position:relative;width:148px;height:148px;flex:none}
+.holo svg{position:absolute;inset:0}
+.holo .halo{position:absolute;inset:12px;border-radius:50%;border:1px dashed var(--b);opacity:.55;animation:spin 30s linear infinite reverse}
+.holo .orb{position:absolute;inset:18px;border-radius:50%;background:conic-gradient(from 0deg,var(--a),var(--b),var(--c),var(--a));animation:spin 12s linear infinite;opacity:.92}
+.holo .orb::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(0deg,rgba(255,255,255,.30) 0 1px,transparent 1px 4px);mix-blend-mode:soft-light}
+.holo .core{position:absolute;inset:32px;border-radius:50%;background:var(--card);display:grid;place-content:center;text-align:center;line-height:1.2}
+.holo .core b{font-size:24px;font-weight:800}
+.holo .core span{font-size:11px;color:var(--sub)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero .t{min-width:0;flex:1}
+.big{font-size:28px;font-weight:800;line-height:1.25}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.mini{background:var(--tag);border-radius:12px;padding:8px 10px;min-width:0}
+.mini b{display:block;font-weight:700;font-size:15px}
+.mini span{font-size:12px;color:var(--sub)}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 8px}
+.goal{margin-bottom:10px}
+.goal .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.goal .name{font-weight:700;min-width:0}
+.badge{display:inline-block;font-size:12px;font-weight:700;border-radius:8px;padding:1px 8px;background:var(--tag);color:var(--a)}
+.badge.late{background:color-mix(in srgb,var(--bad) 16%,var(--card));color:var(--bad)}
+.badge.ok{background:color-mix(in srgb,var(--good) 16%,var(--card));color:var(--good)}
+.bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin:10px 0 8px}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--c))}
+.bar.full i{background:var(--good)}
+.goal .foot{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--sub);flex-wrap:wrap}
+.btn{background:var(--a);color:var(--on-a);border-radius:12px;padding:9px 16px;font-weight:700}
+.btn.ghost{background:var(--tag);color:var(--a)}
+.btn.danger{background:color-mix(in srgb,var(--bad) 14%,var(--card));color:var(--bad)}
+.btn.sm{padding:4px 12px;font-size:13px;border-radius:10px}
+.btn.wide{width:100%}
+.hbar{display:grid;grid-template-columns:78px 1fr auto;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+.hbar .tr{height:8px;border-radius:99px;background:var(--soft);overflow:hidden}
+.hbar .tr i{display:block;height:100%;background:var(--b);border-radius:99px}
+.hbar .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+svg text{font-family:var(--font)}
+.field{display:block;margin-bottom:12px}
+.field>span{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+.in{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;min-height:44px}
+textarea.in{min-height:96px;resize:vertical;font-size:17px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.chips button{background:var(--tag);color:var(--a);border-radius:999px;padding:3px 12px;font-size:13px}
+.err{color:var(--bad);font-size:13px;margin:4px 0}
+.micwrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin:6px 0 14px}
+.mic{width:84px;height:84px;border-radius:50%;background:conic-gradient(from 0deg,var(--a),var(--b),var(--c),var(--a));display:grid;place-items:center;color:#fff}
+.mic span{width:70px;height:70px;border-radius:50%;background:var(--a);display:grid;place-items:center}
+.list .item{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.list .item:last-child{border-bottom:0}
+.item .l{min-width:0}.item .r{text-align:left;flex:none}
+.acts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);
+  padding:6px max(10px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-right,0px));
+  display:grid;grid-template-columns:repeat(5,1fr);align-items:end;z-index:20}
+.tabs button{display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--sub);font-size:11px;padding:4px 0;min-height:48px;justify-content:center}
+.tabs button.on{color:var(--a);font-weight:700}
+.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs .rec{margin-top:-18px}
+.tabs .rec span.c{width:54px;height:54px;border-radius:50%;background:var(--a);color:var(--on-a);display:grid;place-items:center;border:4px solid var(--bg)}
+.tabs .rec svg{stroke:var(--on-a)}
+#sheet{position:fixed;inset:0;z-index:40}
+#sheet .scrim{position:absolute;inset:0;background:var(--scrim)}
+#sheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:90%;overflow-y:auto;background:var(--bg);border-radius:22px 22px 0 0;
+  padding:16px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px))}
+#sheet .inner{max-width:520px;margin:0 auto}
+.grab{width:42px;height:4px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.prev{background:var(--tag);border-radius:12px;padding:10px 12px;font-size:14px;margin:4px 0 12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);border-radius:12px;padding:8px 14px;font-size:14px;z-index:60;display:flex;gap:12px;align-items:center;max-width:92%}
+.toast button{color:var(--c);font-weight:700}
+.themes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.themes button{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px;text-align:right;display:block;width:100%}
+.themes button.on{border-color:var(--a)}
+.sw{display:flex;gap:4px;margin-bottom:6px}.sw i{width:20px;height:20px;border-radius:50%;display:block}
+.empty{text-align:center;color:var(--sub);padding:18px 8px}
+@media (prefers-reduced-motion:reduce){.holo .halo,.holo .orb{animation:none}}
+</style>
+
+</head><body>
+<div id="app" class="wrap" dir="rtl">
+  <main id="v-home"></main>
+  <main id="v-record" hidden></main>
+  <main id="v-goals" hidden></main>
+  <main id="v-history" hidden></main>
+  <main id="v-settings" hidden></main>
+</div>
+
+<nav class="tabs" dir="rtl" aria-label="منوی اصلی">
+  <button data-go="home" class="on"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>خانه</button>
+  <button data-go="goals"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6"/></svg>هدف‌ها</button>
+  <button data-go="record" class="rec"><span class="c"><svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></svg></span>دریافتی</button>
+  <button data-go="history"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9"/></svg>تاریخچه</button>
+  <button data-go="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg>تنظیمات</button>
+</nav>
+
+<div id="sheet" hidden dir="rtl"><div class="scrim" data-act="close"></div><div class="panel"><div class="inner"><div class="grab"></div><div id="sheet-body"></div></div></div></div>
+<div id="toast" class="toast" hidden dir="rtl"></div>
+
+<script>
+var pad = function (n) { return String(n).padStart(2, '0'); };
+var ymd = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+var parseYmd = function (s) { var p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); };
+var todayStr = function () { return ymd(new Date()); };
+var addDays = function (s, n) { var d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+var diffDays = function (a, b) { return Math.round((parseYmd(a) - parseYmd(b)) / 864e5); };
+var clampDay = function (y, m, day) { return Math.min(day, new Date(y, m, 0).getDate()); };
+
+function normDigits(s) {
+  return String(s)
+    .replace(/[۰-۹]/g, function (c) { return String(c.charCodeAt(0) - 1776); })
+    .replace(/[٠-٩]/g, function (c) { return String(c.charCodeAt(0) - 1632); })
+    .replace(/٫/g, '.')
+    .replace(/[٬,،]/g, '')
+    .replace(/ي/g, 'ی')
+    .replace(/ك/g, 'ک')
+    .replace(/‌/g, ' ')
+    .replace(/\s+/g, ' ');
+}
+function num(s) { var v = parseFloat(normDigits(s)); return isFinite(v) ? v : 0; }
+function normName(s) { return normDigits(s).trim(); }
+
+function parseCommand(raw, sources, persons) {
+  var t = normDigits(raw).trim();
+  if (!/^(دریافتی|دریافت)(\s|$)/.test(t)) return { ok: false, reason: 'start' };
+  t = t.replace(/^(دریافتی|دریافت)(\s+شد)?\s*/, '');
+
+  var cur = null, best = Infinity, m, re;
+  var curDefs = [['USD', /دلار|\$/], ['EUR', /یورو|€/], ['TRY', /لیر|₺/]];
+  curDefs.forEach(function (c) {
+    m = t.match(c[1]);
+    if (m && m.index < best) { best = m.index; cur = c[0]; }
+  });
+  t = t.replace(/دلاری|دلار|\$|یورو|€|لیری|لیر|₺/g, ' ');
+
+  var amount = null;
+  m = t.match(/(\d+(?:\.\d+)?)\s*(هزار|میلیون)?/);
+  if (m) {
+    amount = parseFloat(m[1]);
+    if (m[2] === 'هزار') amount *= 1000;
+    if (m[2] === 'میلیون') amount *= 1e6;
+    t = t.replace(m[0], ' ');
+  }
+  t = t.replace(/\s+/g, ' ').trim();
+  t = t.replace(/خرید و فروش|خرید فروش|خرید و فروشی/g, 'فروش');
+
+  function findKnown(list) {
+    var sorted = list.slice().sort(function (a, b) { return normName(b).length - normName(a).length; });
+    for (var i = 0; i < sorted.length; i++) {
+      var n = normName(sorted[i]);
+      if (n && (' ' + t + ' ').indexOf(' ' + n + ' ') !== -1) {
+        t = (' ' + t + ' ').replace(' ' + n + ' ', ' ').trim();
+        return sorted[i];
+      }
+    }
+    return null;
+  }
+  var source = findKnown(sources || []);
+  var person = findKnown(persons || []);
+  var sourceNew = false, personNew = false;
+
+  var tokens = t.split(' ').filter(Boolean);
+  function phraseAfter(word, stops) {
+    var i = tokens.indexOf(word);
+    if (i === -1) return null;
+    var out = [];
+    for (var j = i + 1; j < tokens.length; j++) {
+      if (stops.indexOf(tokens[j]) !== -1) break;
+      out.push(tokens[j]);
+    }
+    tokens.splice(i, 1 + out.length);
+    return out.join(' ') || null;
+  }
+  if (!person) {
+    var p = phraseAfter('از', ['بابت', 'برای']);
+    if (p) { person = p; personNew = true; }
+  } else {
+    var ix = tokens.indexOf('از');
+    if (ix !== -1) tokens.splice(ix, 1);
+  }
+  if (!source) {
+    var s = phraseAfter('بابت', ['از']);
+    if (s) { source = s; sourceNew = true; }
+  } else {
+    var iy = tokens.indexOf('بابت');
+    if (iy !== -1) tokens.splice(iy, 1);
+  }
+  if (!source) {
+    var left = tokens.filter(function (w) { return ['از', 'بابت', 'برای', 'به', 'و'].indexOf(w) === -1; }).join(' ');
+    if (left) { source = left; sourceNew = true; }
+  }
+  return { ok: amount !== null && amount > 0, reason: amount ? null : 'amount', amount: amount, cur: cur, source: source, sourceNew: sourceNew, person: person, personNew: personNew };
+}
+
+function funded(S, key, ex) {
+  var t = 0;
+  S.receipts.forEach(function (r) {
+    if (r.id === ex) return;
+    (r.alloc || []).forEach(function (a) { if (a.key === key) t += a.try; });
+  });
+  return t;
+}
+
+function instances(S, t, ex) {
+  t = t || todayStr();
+  var out = [];
+  S.goals.forEach(function (g) {
+    if (g.type === 'once') {
+      if (S.done.indexOf(g.id) !== -1) return;
+      out.push({ key: g.id, goal: g, name: g.name, amount: g.amount, due: g.due });
+      return;
+    }
+    var base = parseYmd(t);
+    var gotUpcoming = false;
+    for (var off = -2; off <= 3; off++) {
+      var d = new Date(base.getFullYear(), base.getMonth() + off, 1);
+      var y = d.getFullYear(), mo = d.getMonth() + 1;
+      var due = y + '-' + pad(mo) + '-' + pad(clampDay(y, mo, g.day));
+      if (due < g.start) continue;
+      var key = g.id + '@' + y + '-' + pad(mo);
+      if (S.done.indexOf(key) !== -1) continue;
+      var inst = { key: key, goal: g, name: g.name, amount: g.amount, due: due };
+      if (due < t) {
+        if (funded(S, key, ex) < g.amount - 0.5) out.push(inst);
+      } else if (!gotUpcoming) {
+        out.push(inst);
+        gotUpcoming = true;
+      }
+    }
+  });
+  out.sort(function (a, b) { return a.due < b.due ? -1 : a.due > b.due ? 1 : 0; });
+  return out;
+}
+
+function allocate(S, tryVal, targetKey, ex) {
+  var insts = instances(S, null, ex);
+  var order = insts.map(function (i) { return { i: i, rem: i.amount - funded(S, i.key, ex) }; }).filter(function (x) { return x.rem > 0.5; });
+  var alloc = [], left = tryVal;
+  if (targetKey) {
+    var tg = order.filter(function (x) { return x.i.key === targetKey; })[0];
+    if (tg) {
+      var a0 = Math.min(left, tg.rem);
+      alloc.push({ key: tg.i.key, try: a0 });
+      left -= a0; tg.rem -= a0;
+    }
+  }
+  order.forEach(function (x) {
+    if (left <= 0.5 || x.rem <= 0.5) return;
+    var a = Math.min(left, x.rem);
+    alloc.push({ key: x.i.key, try: a });
+    left -= a; x.rem -= a;
+  });
+  return { alloc: alloc, surplus: Math.max(0, left) };
+}
+
+function mergeAlloc(base, extra) {
+  var out = (base || []).map(function (a) { return { key: a.key, try: a.try }; });
+  extra.forEach(function (e) {
+    var f = out.filter(function (o) { return o.key === e.key; })[0];
+    if (f) f.try += e.try; else out.push({ key: e.key, try: e.try });
+  });
+  return out;
+}
+
+function applySurplus(S) {
+  var sorted = S.receipts.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+  sorted.forEach(function (r) {
+    if ((r.surplus || 0) > 0.5) {
+      var res = allocate(S, r.surplus, null, null);
+      r.alloc = mergeAlloc(r.alloc, res.alloc);
+      r.surplus = res.surplus;
+    }
+  });
+}
+
+function convertReceipt(r, newRate) {
+  var newTry = r.amount * newRate;
+  var k = r.try > 0 ? newTry / r.try : 1;
+  r.alloc = (r.alloc || []).map(function (a) { return { key: a.key, try: a.try * k }; });
+  r.surplus = (r.surplus || 0) * k;
+  r.try = newTry;
+  r.rate = newRate;
+  r.held = false;
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = { normDigits: normDigits, parseCommand: parseCommand, instances: instances, allocate: allocate, funded: funded, convertReceipt: convertReceipt, applySurplus: applySurplus, addDays: addDays, diffDays: diffDays, todayStr: todayStr, num: num };
+}
+
+</script>
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+var KEY = 'hadaf-tracker-v1';
+var SYM = { TRY: '₺', USD: '$', EUR: '€' };
+var CURN = { TRY: 'لیر', USD: 'دلار', EUR: 'یورو' };
+var THEMES = [
+  { id: 'ice', name: 'یخ‌آبی', d: 'شفاف و تمیز', c: ['#2F7BEA', '#7C5CFA', '#22C6D8'] },
+  { id: 'mint', name: 'نعنایی', d: 'آرام و مالی', c: ['#0E8A6B', '#2BB6C9', '#8BD96B'] },
+  { id: 'gold', name: 'شنی و طلایی', d: 'گرم و شیک', c: ['#B7700A', '#E0563C', '#E9B949'] },
+  { id: 'pearl', name: 'مرواریدی بنفش', d: 'نرم و لوکس', c: ['#7C4DEB', '#E05BA6', '#4C9BF0'] },
+  { id: 'night', name: 'شب', d: 'تیره و کم‌نور', c: ['#5B9BFF', '#9B7BFF', '#3DD6E6'] }
+];
+function nf(n, d) { return Number(n).toLocaleString('fa-IR', { maximumFractionDigits: d == null ? 0 : d, minimumFractionDigits: 0 }); }
+function money(v, cur) { cur = cur || 'TRY'; return nf(v, cur === 'TRY' ? 0 : 2) + ' ' + SYM[cur]; }
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function uid() { return Math.random().toString(36).slice(2, 9); }
+var fG, fGy, fJ;
+try {
+  fG = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { day: 'numeric', month: 'long' });
+  fGy = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric' });
+  fJ = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric' });
+} catch (e) { fG = fGy = fJ = new Intl.DateTimeFormat('en-GB'); }
+function dG(s) { return fGy.format(parseYmd(s)); }
+function dJ(s) { return fJ.format(parseYmd(s)); }
+
+function seed() {
+  var t = todayStr();
+  var S0 = {
+    v: 1, demo: true, theme: 'ice', lastBackup: null, lastCur: 'USD',
+    rates: { USD: { v: 49, date: t }, EUR: { v: 57, date: t }, set: false },
+    sources: ['پورسانت', 'کمیسیون', 'فروش', 'واسطه‌گری'], persons: ['عباس', 'متین'],
+    goals: [
+      { id: 'g1', name: 'اجاره‌ی خونه', amount: 16000, type: 'monthly', day: 1, start: t },
+      { id: 'g2', name: 'قسط کردیت کارت', amount: 20000, type: 'monthly', day: 5, start: t },
+      { id: 'g3', name: 'قبض و شارژ', amount: 4500, type: 'once', due: addDays(t, 10) }
+    ],
+    receipts: [], done: []
+  };
+  [[-5, 250, 'USD', 48.6, 'پورسانت', 'عباس', false], [-3, 6000, 'TRY', 1, 'فروش', '', false], [-1, 150, 'EUR', 56.8, 'واسطه‌گری', 'متین', true]].forEach(function (x) {
+    var tv = x[1] * x[3];
+    var res = allocate(S0, tv, null, null);
+    S0.receipts.push({ id: uid(), date: addDays(t, x[0]), amount: x[1], cur: x[2], rate: x[3], try: tv, source: x[4], person: x[5], held: x[6], alloc: res.alloc, surplus: res.surplus, demo: true });
+  });
+  return S0;
+}
+function load() {
+  try { var r = localStorage.getItem(KEY); if (r) { var o = JSON.parse(r); if (o && o.goals && o.receipts) return o; } } catch (e) {}
+  return null;
+}
+var S = load() || seed();
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function setTheme(id) { document.documentElement.setAttribute('data-app', id); S.theme = id; try { var m = document.querySelector('meta[name=theme-color]'); if (m) m.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()); } catch (e) {} }
+document.documentElement.dir = 'rtl';
+document.documentElement.lang = 'fa';
+setTheme(S.theme || 'ice');
+
+var view = 'home';
+function go(v) {
+  view = v;
+  ['home', 'record', 'goals', 'history', 'settings'].forEach(function (n) { $('v-' + n).hidden = n !== v; });
+  document.querySelectorAll('.tabs button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-go') === v); });
+  render();
+  window.scrollTo(0, 0);
+}
+function render() {
+  if (view === 'home') renderHome();
+  else if (view === 'record') renderRecord();
+  else if (view === 'goals') renderGoals();
+  else if (view === 'history') renderHistory();
+  else renderSettings();
+}
+function openSheet(html) { $('sheet-body').innerHTML = html; $('sheet').hidden = false; document.body.classList.add('lock'); $('sheet').querySelector('.panel').scrollTop = 0; }
+function closeSheet() { $('sheet').hidden = true; document.body.classList.remove('lock'); $('sheet-body').innerHTML = ''; }
+var toastT = null, undoFn = null;
+function toast(msg, undo) {
+  var el = $('toast'); undoFn = undo || null;
+  el.innerHTML = '<span>' + esc(msg) + '</span>' + (undo ? '<button data-act="undo">برگردان</button>' : '');
+  el.hidden = false; clearTimeout(toastT);
+  toastT = setTimeout(function () { el.hidden = true; undoFn = null; }, undo ? 7000 : 2600);
+}
+
+function stats() {
+  var t = todayStr(), insts = instances(S, t, null);
+  var need = 0, got = 0;
+  insts.forEach(function (i) { var f = funded(S, i.key, null); i.f = f; need += i.amount; got += Math.min(f, i.amount); });
+  var surplus = 0; S.receipts.forEach(function (r) { surplus += r.surplus || 0; });
+  var heldLive = 0, heldRec = 0, held = {};
+  S.receipts.forEach(function (r) {
+    if (r.held && r.cur !== 'TRY') {
+      var rate = S.rates[r.cur].v;
+      heldLive += r.amount * rate; heldRec += r.try;
+      held[r.cur] = (held[r.cur] || 0) + r.amount;
+    }
+  });
+  var m0 = t.slice(0, 7), month = 0;
+  S.receipts.forEach(function (r) { if (r.date.slice(0, 7) === m0) month += r.try; });
+  return { t: t, insts: insts, need: need, got: got, rem: Math.max(0, need - got), pct: need > 0 ? got / need : 0, surplus: surplus, heldLive: heldLive, heldRec: heldRec, held: held, month: month };
+}
+
+function barChart() {
+  var t = todayStr(), days = [], i;
+  for (i = 13; i >= 0; i--) days.push({ d: addDays(t, -i), v: 0 });
+  S.receipts.forEach(function (r) { days.forEach(function (x) { if (x.d === r.date) x.v += r.try; }); });
+  var max = Math.max.apply(null, days.map(function (x) { return x.v; })) || 1;
+  var W = 340, H = 140, pl = 6, pb = 20, pt = 18, n = days.length, bw = (W - pl * 2) / n, g = 5, out = '';
+  out += '<line x1="' + pl + '" x2="' + (W - pl) + '" y1="' + (H - pb) + '" y2="' + (H - pb) + '" stroke="var(--line)"/>';
+  out += '<line x1="' + pl + '" x2="' + (W - pl) + '" y1="' + (pt + (H - pb - pt) / 2) + '" y2="' + (pt + (H - pb - pt) / 2) + '" stroke="var(--line)" stroke-dasharray="3 4"/>';
+  days.forEach(function (x, k) {
+    var h = (H - pb - pt) * (x.v / max), px = W - pl - (k + 1) * bw + g / 2, py = H - pb - h;
+    if (x.v > 0) out += '<rect x="' + px.toFixed(1) + '" y="' + py.toFixed(1) + '" width="' + (bw - g).toFixed(1) + '" height="' + h.toFixed(1) + '" rx="4" fill="' + (x.v === max ? 'var(--a)' : 'var(--soft)') + '"/>';
+    else out += '<rect x="' + px.toFixed(1) + '" y="' + (H - pb - 2) + '" width="' + (bw - g).toFixed(1) + '" height="2" rx="1" fill="var(--soft)"/>';
+    if (x.v === max && x.v > 0) out += '<text x="' + (px + (bw - g) / 2).toFixed(1) + '" y="' + (py - 5).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">' + nf(x.v) + '</text>';
+    if (k % 2 === 0) out += '<text x="' + (px + (bw - g) / 2).toFixed(1) + '" y="' + (H - 5) + '" text-anchor="middle" font-size="11" fill="var(--sub)">' + nf(parseYmd(x.d).getDate()) + '</text>';
+  });
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="نمودار دریافتی ۱۴ روز اخیر به لیر">' + out + '</svg>';
+}
+function sourceChart() {
+  var t = todayStr(), from = addDays(t, -29), by = {}, tot = 0;
+  S.receipts.forEach(function (r) { if (r.date >= from) { by[r.source || 'بدون منبع'] = (by[r.source || 'بدون منبع'] || 0) + r.try; tot += r.try; } });
+  var rows = Object.keys(by).map(function (k) { return [k, by[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+  if (!rows.length) return '<div class="empty">هنوز دریافتی‌ای ثبت نشده.</div>';
+  return rows.map(function (r) {
+    var p = r[1] / tot;
+    return '<div class="hbar"><span class="l">' + esc(r[0]) + '</span><span class="tr"><i style="width:' + (p * 100).toFixed(1) + '%"></i></span><span class="num">' + nf(p * 100) + '٪ · ' + nf(r[1]) + '</span></div>';
+  }).join('');
+}
+
+function renderHome() {
+  var s = stats(), t = s.t, h = '';
+  var circ = 2 * Math.PI * 71, off = circ * (1 - Math.min(1, s.pct));
+  h += '<div class="top"><div><h1>ردیاب هدف</h1><p class="sub">' + dG(t) + ' · ' + dJ(t) + '</p></div><div class="tools">' +
+    '<button class="chip" data-act="rates" aria-label="نرخ ارز"><span class="num">$ ' + nf(S.rates.USD.v, 2) + '</span></button>' +
+    '<button class="chip" data-act="themes" aria-label="تغییر تم"><span class="dot"></span>رنگ</button></div></div>';
+  if (S.demo) h += '<div class="banner"><span>این هدف‌ها و دریافتی‌ها نمونه‌ست.</span><button data-act="demo-clear">پاک کردن نمونه‌ها</button></div>';
+  if (!S.rates.set) h += '<div class="banner warn"><span>نرخ‌ها هنوز دستی تنظیم نشدن.</span><button data-act="rates">تنظیم نرخ</button></div>';
+  else if (diffDays(t, S.rates.USD.date) >= 2) h += '<div class="banner warn"><span>نرخ دلار از ' + nf(diffDays(t, S.rates.USD.date)) + ' روز پیشه.</span><button data-act="rates">به‌روز کن</button></div>';
+  if (!S.lastBackup || diffDays(t, S.lastBackup) >= 7) h += '<div class="banner"><span>وقت پشتیبان‌گیریه.</span><button data-act="backup-export">پشتیبان بگیر</button></div>';
+  h += '<section class="card hero"><div class="holo" role="img" aria-label="پیشرفت کل ' + nf(Math.round(s.pct * 100)) + ' درصد"><span class="halo"></span><span class="orb"></span>' +
+    '<svg viewBox="0 0 148 148"><circle cx="74" cy="74" r="71" fill="none" stroke="var(--soft)" stroke-width="5"/><circle cx="74" cy="74" r="71" fill="none" stroke="var(--a)" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '" transform="rotate(-90 74 74)"/></svg>' +
+    '<div class="core"><b class="num">' + nf(Math.round(s.pct * 100)) + '٪</b><span>پیشرفت کل</span></div></div>' +
+    '<div class="t"><p class="sub">باقی‌مونده</p><p class="big num">' + money(s.rem) + '</p><p class="sub num">از ' + money(s.need) + '</p></div></section>';
+  h += '<div class="grid2"><div class="mini"><span>دریافتی این ماه</span><b class="num">' + money(s.month) + '</b></div><div class="mini"><span>مازاد (بیشتر از هدف)</span><b class="num">' + money(s.surplus) + '</b></div></div>';
+  if (s.surplus > 0.5 && s.insts.some(function (i) { return i.f < i.amount - 0.5; })) h += '<div class="banner" style="margin-top:10px"><span>مازاد داری و هدف باز هست.</span><button data-act="apply-surplus">اعمال کن</button></div>';
+
+  h += '<div class="sec"><h2>هدف‌ها</h2><button class="btn ghost sm" data-go="goals">مدیریت</button></div>';
+  if (!s.insts.length) h += '<div class="card empty">هدفی نیست. از بخش «هدف‌ها» یکی اضافه کن.</div>';
+  s.insts.forEach(function (i) {
+    var left = diffDays(i.due, t), p = Math.min(1, i.f / i.amount), r = i.amount - i.f, full = r <= 0.5;
+    var badge = full ? '<span class="badge ok">کامل شد</span>' : left < 0 ? '<span class="badge late">' + nf(-left) + ' روز گذشته</span>' : left === 0 ? '<span class="badge late">امروز</span>' : '<span class="badge">' + nf(left) + ' روز مونده</span>';
+    h += '<article class="card goal"><div class="row"><div class="name">' + esc(i.name) + '<div class="sub">' + dG(i.due) + ' · ' + dJ(i.due) + '</div></div>' + badge + '</div>' +
+      '<div class="bar' + (full ? ' full' : '') + '"><i style="width:' + (p * 100).toFixed(1) + '%"></i></div>' +
+      '<div class="foot"><span class="num">' + (full ? 'جمع‌شده ' + money(i.f) : 'باقی‌مونده ' + money(r)) + '</span><span class="num">' + nf(Math.round(p * 100)) + '٪ از ' + money(i.amount) + '</span></div>' +
+      (full || left < 0 ? '<div class="acts"><button class="btn ghost sm" data-act="inst-done" data-key="' + i.key + '">پرداخت شد</button></div>' : '') + '</article>';
+  });
+  var hk = Object.keys(s.held);
+  if (hk.length) {
+    var delta = s.heldLive - s.heldRec;
+    h += '<div class="sec"><h2>موجودی ارزی نگه‌داشته</h2></div><section class="card"><p>' + hk.map(function (k) { return '<b class="num">' + money(s.held[k], k) + '</b>'; }).join(' و ') + '</p>' +
+      '<p class="num" style="margin-top:4px">با نرخ امروز می‌شه <b>' + money(s.heldLive) + '</b></p>' +
+      '<p class="sub num">' + (Math.abs(delta) < 1 ? 'تقریباً برابر روز ثبت.' : (delta > 0 ? money(delta) + ' بیشتر' : money(-delta) + ' کمتر') + ' از روز ثبت. اگه الان تبدیل کنی، باقی‌مونده‌ی کل می‌شه ' + money(Math.max(0, s.rem - delta)) + '.') + '</p></section>';
+  }
+  h += '<div class="sec"><h2>دریافتی ۱۴ روز اخیر</h2><span class="sub">لیر</span></div><section class="card">' + barChart() + '</section>';
+  h += '<div class="sec"><h2>منبع درآمد (۳۰ روز)</h2></div><section class="card">' + sourceChart() + '</section>';
+  $('v-home').innerHTML = h;
+}
+
+function renderRecord() {
+  var ex = ['دریافت از عباس بابت پورسانت ۳۵۰ دلار', 'دریافت کمیسیون ۲۰۰ یورو', 'دریافت بابت فروش ۱۵ هزار لیر'];
+  var h = '<div class="top"><div><h1>دریافتی جدید</h1><p class="sub">جمله با «دریافت» شروع بشه.</p></div></div>';
+  h += '<div class="micwrap"><button class="mic" data-act="mic" aria-label="شروع دیکته"><span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></button><p class="sub" style="text-align:center">این دکمه کادر رو باز می‌کنه. تو کیبورد گوشی میکروفون رو بزن و حرف بزن.</p></div>';
+  h += '<label class="field"><span>جمله</span><textarea id="vc" class="in" placeholder="دریافت از عباس بابت پورسانت ۳۵۰ دلار" dir="rtl"></textarea></label><div id="vc-err" class="err" hidden></div>';
+  h += '<div class="chips">' + ex.map(function (e) { return '<button data-act="example" data-t="' + esc(e) + '">' + esc(e) + '</button>'; }).join('') + '</div>';
+  h += '<div class="two" style="margin-top:12px"><button class="btn" data-act="parse">بفهم و نشون بده</button><button class="btn ghost" data-act="manual">ثبت دستی</button></div>';
+  $('v-record').innerHTML = h;
+}
+
+function goalLine(g) {
+  return g.type === 'monthly' ? 'هر ماه، روز ' + nf(g.day) : dG(g.due);
+}
+function renderGoals() {
+  var h = '<div class="top"><div><h1>هدف‌ها</h1><p class="sub">همه‌ی مبلغ‌ها به لیره.</p></div><button class="btn sm" data-act="goal-new">هدف جدید</button></div>';
+  if (!S.goals.length) h += '<div class="card empty">هنوز هدفی نداری.</div>';
+  S.goals.forEach(function (g) {
+    h += '<article class="card goal"><div class="row"><div class="name">' + esc(g.name) + '<div class="sub">' + goalLine(g) + '</div></div><b class="num">' + money(g.amount) + '</b></div><div class="acts"><button class="btn ghost sm" data-act="goal-edit" data-id="' + g.id + '">ویرایش</button><button class="btn danger sm" data-act="goal-del" data-id="' + g.id + '">حذف</button></div></article>';
+  });
+  $('v-goals').innerHTML = h;
+}
+
+function renderHistory() {
+  var h = '<div class="top"><div><h1>تاریخچه</h1><p class="sub">همه‌ی دریافتی‌ها</p></div><button class="btn sm" data-act="manual">دریافتی جدید</button></div>';
+  var list = S.receipts.slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+  if (!list.length) h += '<div class="card empty">دریافتی‌ای ثبت نشده.</div>';
+  else {
+    h += '<section class="card list">';
+    list.forEach(function (r) {
+      var parts = [r.source, r.person ? 'از ' + r.person : ''].filter(Boolean).join(' · ');
+      h += '<div class="item"><div class="l"><b>' + esc(parts || 'دریافتی') + '</b>' + (r.held ? ' <span class="badge">نگه‌داشته</span>' : '') +
+        '<div class="sub">' + dG(r.date) + ' · ' + dJ(r.date) + '</div>' +
+        '<div class="acts"><button class="btn ghost sm" data-act="rc-edit" data-id="' + r.id + '">ویرایش</button>' +
+        (r.held ? '<button class="btn ghost sm" data-act="rc-convert" data-id="' + r.id + '">تبدیل کردم</button>' : '') +
+        '<button class="btn danger sm" data-act="rc-del" data-id="' + r.id + '">حذف</button></div></div>' +
+        '<div class="r num"><b>' + money(r.amount, r.cur) + '</b>' + (r.cur !== 'TRY' ? '<div class="sub">نرخ ' + nf(r.rate, 2) + '</div><div class="sub">= ' + money(r.try) + '</div>' : '') + '</div></div>';
+    });
+    h += '</section>';
+  }
+  $('v-history').innerHTML = h;
+}
+
+function renderSettings() {
+  var t = todayStr();
+  var h = '<div class="top"><h1>تنظیمات</h1></div>';
+  h += '<section class="card"><h2>رنگ و تم</h2><p class="sub" style="margin-bottom:8px">تم فعلی: ' + esc(THEMES.filter(function (x) { return x.id === S.theme; })[0].name) + '</p><button class="btn ghost" data-act="themes">تغییر تم</button></section>';
+  h += '<section class="card" style="margin-top:12px"><h2>نرخ ارز</h2><p class="sub num" style="margin:4px 0 8px">دلار ' + nf(S.rates.USD.v, 2) + ' · یورو ' + nf(S.rates.EUR.v, 2) + ' (' + dG(S.rates.USD.date) + ')</p><button class="btn ghost" data-act="rates">تنظیم نرخ</button></section>';
+  h += '<section class="card" style="margin-top:12px"><h2>منبع‌های درآمد</h2>' + listEditor('sources', S.sources) + '</section>';
+  h += '<section class="card" style="margin-top:12px"><h2>افراد</h2>' + listEditor('persons', S.persons) + '</section>';
+  h += '<section class="card" style="margin-top:12px"><h2>پشتیبان‌گیری</h2><p class="sub" style="margin:4px 0 10px">' + (S.lastBackup ? 'آخرین پشتیبان: ' + dG(S.lastBackup) : 'هنوز پشتیبان نگرفتی.') + ' داده فقط روی همین گوشیه و تو همین نسخه‌ی نصب‌شده.</p>' +
+    '<div class="two"><button class="btn" data-act="backup-export">ذخیره‌ی فایل</button><button class="btn ghost" data-act="backup-copy">کپی متن</button></div>' +
+    '<label class="field" style="margin-top:12px"><span>بازیابی: فایل پشتیبان رو انتخاب کن</span><input id="imp-file" class="in" type="file" accept=".json,application/json"></label>' +
+    '<label class="field"><span>یا متن پشتیبان رو اینجا بچسبون</span><textarea id="imp-text" class="in" style="min-height:70px;font-size:13px" dir="ltr"></textarea></label><div id="imp-err" class="err" hidden></div>' +
+    '<button class="btn danger wide" data-act="import-apply" data-two="1">جایگزین کردن داده‌ها با این پشتیبان</button></section>';
+  h += '<section class="card" style="margin-top:12px"><h2>پاک کردن همه چیز</h2><p class="sub" style="margin:4px 0 10px">همه‌ی هدف‌ها و دریافتی‌ها پاک می‌شه.</p><button class="btn danger wide" data-act="reset-all" data-two="1">پاک کردن همه</button></section>';
+  $('v-settings').innerHTML = h;
+}
+function listEditor(kind, arr) {
+  var h = '<div class="chips">' + arr.map(function (x, i) { return '<button data-act="list-del" data-kind="' + kind + '" data-i="' + i + '" aria-label="حذف ' + esc(x) + '">' + esc(x) + ' ✕</button>'; }).join('') + '</div>';
+  h += '<div style="display:flex;gap:8px;margin-top:6px"><input class="in" id="add-' + kind + '" placeholder="اسم جدید" dir="rtl"><button class="btn" data-act="list-add" data-kind="' + kind + '">اضافه</button></div>';
+  return h;
+}
+
+/* ---------- receipt sheet ---------- */
+var rc = null;
+function selOpts(list, cur, extra) {
+  var h = extra || '';
+  list.forEach(function (x) { h += '<option value="' + esc(x) + '"' + (x === cur ? ' selected' : '') + '>' + esc(x) + '</option>'; });
+  return h;
+}
+function openReceipt(pre, editId) {
+  var t = todayStr();
+  rc = Object.assign({ id: editId || null, amount: '', cur: S.lastCur || 'USD', source: S.sources[0] || '', sourceNew: false, person: '', personNew: false, date: t, target: '', held: false, rate: null }, pre || {});
+  if (rc.cur !== 'TRY' && !rc.rate) rc.rate = S.rates[rc.cur].v;
+  if (rc.cur === 'TRY') rc.rate = 1;
+  var sources = S.sources.slice(), persons = S.persons.slice();
+  if (rc.sourceNew && rc.source && sources.indexOf(rc.source) === -1) sources.push(rc.source);
+  if (rc.personNew && rc.person && persons.indexOf(rc.person) === -1) persons.push(rc.person);
+  var insts = instances(S, t, rc.id);
+  var h = '<h2 style="margin-bottom:10px">' + (editId ? 'ویرایش دریافتی' : 'تأیید دریافتی') + '</h2>';
+  h += '<div class="two"><label class="field"><span>مبلغ</span><input id="rc-amount" class="in num" inputmode="decimal" value="' + esc(rc.amount === '' ? '' : String(rc.amount)) + '" placeholder="۳۵۰"></label>' +
+    '<label class="field"><span>واحد پول</span><select id="rc-cur" class="in">' + ['USD', 'EUR', 'TRY'].map(function (c) { return '<option value="' + c + '"' + (c === rc.cur ? ' selected' : '') + '>' + CURN[c] + ' ' + SYM[c] + '</option>'; }).join('') + '</select></label></div>';
+  h += '<div class="two"><label class="field"><span>منبع</span><select id="rc-source" class="in">' + selOpts(sources, rc.source, '') + '<option value="__new">+ منبع جدید…</option></select></label>' +
+    '<label class="field"><span>از طرف</span><select id="rc-person" class="in">' + selOpts(persons, rc.person, '<option value="">بدون نام</option>') + '<option value="__new">+ فرد جدید…</option></select></label></div>';
+  h += '<div id="rc-newwrap" class="two" hidden><input id="rc-newsrc" class="in" placeholder="منبع جدید" hidden dir="rtl"><input id="rc-newper" class="in" placeholder="اسم فرد" hidden dir="rtl"></div>';
+  h += '<div class="two"><label class="field"><span>نرخ به لیر</span><input id="rc-rate" class="in num" inputmode="decimal" value="' + esc(String(rc.rate)) + '"' + (rc.cur === 'TRY' ? ' disabled' : '') + '></label>' +
+    '<label class="field"><span>تاریخ</span><input id="rc-date" class="in" type="date" value="' + rc.date + '"></label></div>';
+  h += '<div class="two"><label class="field"><span>بره روی کدوم هدف</span><select id="rc-target" class="in"><option value="">خودکار (نزدیک‌ترین موعد)</option>' +
+    insts.map(function (i) { return '<option value="' + i.key + '"' + (i.key === rc.target ? ' selected' : '') + '>' + esc(i.name) + '</option>'; }).join('') + '</select></label>' +
+    '<label class="field"><span>وضعیت پول</span><select id="rc-held" class="in"' + (rc.cur === 'TRY' ? ' disabled' : '') + '><option value="0"' + (!rc.held ? ' selected' : '') + '>تبدیل شد</option><option value="1"' + (rc.held ? ' selected' : '') + '>نگه داشتم</option></select></label></div>';
+  h += '<div id="rc-prev" class="prev"></div><div id="rc-err" class="err" hidden></div>';
+  h += '<div class="two"><button class="btn" data-act="rc-save">ثبت</button><button class="btn ghost" data-act="close">لغو</button></div>';
+  openSheet(h);
+  rcPrev();
+}
+function rcRead() {
+  rc.amount = $('rc-amount').value; rc.cur = $('rc-cur').value;
+  rc.date = $('rc-date').value || todayStr();
+  rc.target = $('rc-target').value;
+  var held = $('rc-held');
+  rc.held = rc.cur !== 'TRY' && held.value === '1';
+  var s = $('rc-source').value, p = $('rc-person').value;
+  var ns = $('rc-newsrc'), np = $('rc-newper'), nw = $('rc-newwrap');
+  ns.hidden = s !== '__new'; np.hidden = p !== '__new'; nw.hidden = ns.hidden && np.hidden;
+  if (s === '__new') { rc.source = normName(ns.value); rc.sourceNew = true; } else { rc.source = s; rc.sourceNew = false; }
+  if (p === '__new') { rc.person = normName(np.value); rc.personNew = true; } else { rc.person = p; rc.personNew = false; }
+  var rate = $('rc-rate');
+  if (rc.cur === 'TRY') { rc.rate = 1; rate.disabled = true; held.disabled = true; }
+  else { rate.disabled = false; held.disabled = false; rc.rate = num(rate.value); }
+}
+function rcPrev() {
+  rcRead();
+  var amt = num(rc.amount), tv = amt * (rc.rate || 0), el = $('rc-prev');
+  if (!(amt > 0) || !(tv > 0)) { el.textContent = 'مبلغ و نرخ رو بزن تا حساب کنم.'; return; }
+  var res = allocate(S, tv, rc.target || null, rc.id);
+  var names = {}; instances(S, todayStr(), rc.id).forEach(function (i) { names[i.key] = i.name; });
+  var h = '<b class="num">' + (rc.cur === 'TRY' ? money(tv) : nf(amt, 2) + ' × ' + nf(rc.rate, 2) + ' = ' + money(tv)) + '</b>';
+  res.alloc.forEach(function (a) { h += '<div class="num">' + esc(names[a.key] || '') + ': ' + money(a.try) + '</div>'; });
+  if (res.surplus > 0.5) h += '<div class="num">مازاد: ' + money(res.surplus) + '</div>';
+  el.innerHTML = h;
+}
+function rcSave() {
+  rcRead();
+  var amt = num(rc.amount), err = $('rc-err');
+  if (!(amt > 0)) { err.textContent = 'مبلغ رو بزن.'; err.hidden = false; return; }
+  if (!(rc.rate > 0)) { err.textContent = 'نرخ رو بزن.'; err.hidden = false; return; }
+  if (rc.sourceNew && !rc.source) { err.textContent = 'اسم منبع جدید رو بزن یا از لیست انتخاب کن.'; err.hidden = false; return; }
+  if (rc.personNew && !rc.person) { err.textContent = 'اسم فرد رو بزن یا از لیست انتخاب کن.'; err.hidden = false; return; }
+  if (rc.sourceNew && S.sources.indexOf(rc.source) === -1) S.sources.push(rc.source);
+  if (rc.personNew && rc.person && S.persons.indexOf(rc.person) === -1) S.persons.push(rc.person);
+  var tv = amt * rc.rate, res = allocate(S, tv, rc.target || null, rc.id);
+  var rec = { id: rc.id || uid(), date: rc.date, amount: amt, cur: rc.cur, rate: rc.rate, try: tv, source: rc.source, person: rc.person, held: rc.held, alloc: res.alloc, surplus: res.surplus };
+  if (rc.id) { S.receipts = S.receipts.map(function (r) { return r.id === rc.id ? rec : r; }); }
+  else S.receipts.push(rec);
+  S.lastCur = rc.cur;
+  save(); closeSheet(); toast('ثبت شد: ' + money(amt, rc.cur));
+  go('home');
+}
+
+/* ---------- goal sheet ---------- */
+function openGoal(id) {
+  var g = S.goals.filter(function (x) { return x.id === id; })[0] || { type: 'monthly', day: 1, name: '', amount: '', due: addDays(todayStr(), 10) };
+  var t = todayStr(), names = ['اجاره', 'قسط کردیت کارت', 'قبض', 'شارژ ساختمان', 'اینترنت و موبایل', 'مدرسه'];
+  var days = ''; for (var d = 1; d <= 31; d++) days += '<option value="' + d + '"' + (d === g.day ? ' selected' : '') + '>' + nf(d) + '</option>';
+  var h = '<h2 style="margin-bottom:10px">' + (id ? 'ویرایش هدف' : 'هدف جدید') + '</h2><input type="hidden" id="g-id" value="' + (id || '') + '">';
+  h += '<label class="field"><span>اسم هدف</span><input id="g-name" class="in" value="' + esc(g.name) + '" dir="rtl"></label><div class="chips">' + names.map(function (n) { return '<button data-act="g-name" data-n="' + esc(n) + '">' + esc(n) + '</button>'; }).join('') + '</div>';
+  h += '<div class="two"><label class="field"><span>مبلغ (لیر)</span><input id="g-amount" class="in num" inputmode="decimal" value="' + esc(String(g.amount)) + '"></label>' +
+    '<label class="field"><span>نوع</span><select id="g-type" class="in"><option value="monthly"' + (g.type === 'monthly' ? ' selected' : '') + '>هر ماه تکرار بشه</option><option value="once"' + (g.type === 'once' ? ' selected' : '') + '>یک‌بار</option></select></label></div>';
+  h += '<label class="field" id="g-dayw"><span>روز ماه</span><select id="g-day" class="in">' + days + '</select></label>';
+  h += '<div id="g-datew"><label class="field"><span>موعد</span><input id="g-due" class="in" type="date" value="' + (g.due || addDays(t, 10)) + '"></label><div class="chips">' +
+    [['۱۰ روز دیگه', 10], ['۲۰ روز دیگه', 20], ['۳۰ روز دیگه', 30]].map(function (x) { return '<button data-act="g-due" data-n="' + x[1] + '">' + x[0] + '</button>'; }).join('') +
+    '<button data-act="g-due" data-n="eom">آخر این ماه</button><button data-act="g-due" data-n="nm">اول ماه آینده</button></div></div>';
+  h += '<div id="g-err" class="err" hidden></div><div class="two"><button class="btn" data-act="goal-save">ذخیره</button><button class="btn ghost" data-act="close">لغو</button></div>';
+  openSheet(h); goType();
+}
+function goType() { var m = $('g-type').value === 'monthly'; $('g-dayw').hidden = !m; $('g-datew').hidden = m; }
+function goalSave() {
+  var name = normName($('g-name').value), amount = num($('g-amount').value), type = $('g-type').value, id = $('g-id').value, err = $('g-err');
+  if (!name) { err.textContent = 'اسم هدف رو بزن یا یکی از پیشنهادها رو لمس کن.'; err.hidden = false; return; }
+  if (!(amount > 0)) { err.textContent = 'مبلغ رو به لیر بزن.'; err.hidden = false; return; }
+  var obj = { id: id || uid(), name: name, amount: amount, type: type };
+  if (type === 'monthly') { obj.day = parseInt($('g-day').value, 10); obj.start = todayStr(); }
+  else { obj.due = $('g-due').value || addDays(todayStr(), 10); }
+  if (id) S.goals = S.goals.map(function (g) { return g.id === id ? Object.assign({}, g, obj, type === 'monthly' ? {} : {}) : g; });
+  else S.goals.push(obj);
+  save(); closeSheet(); toast('هدف ذخیره شد'); render();
+}
+
+/* ---------- rates / themes ---------- */
+function openRates() {
+  var h = '<h2 style="margin-bottom:4px">نرخ ارز</h2><p class="sub" style="margin-bottom:10px">نرخ از اینترنت می‌آد و نرخ میانی بازاره. با صرافی یا بازار آزاد ممکنه کمی فرق کنه. اگه خواستی، دستی عوضش کن.</p><button class="btn ghost wide" style="margin-bottom:12px" data-act="rates-fetch">دریافت نرخ از اینترنت</button>';
+  h += '<div class="two"><label class="field"><span>هر دلار چند لیر؟</span><input id="r-usd" class="in num" inputmode="decimal" value="' + S.rates.USD.v + '"></label><label class="field"><span>هر یورو چند لیر؟</span><input id="r-eur" class="in num" inputmode="decimal" value="' + S.rates.EUR.v + '"></label></div>';
+  h += '<p class="sub" style="margin-bottom:10px">آخرین به‌روزرسانی: ' + dG(S.rates.USD.date) + '</p><div id="r-err" class="err" hidden></div><div class="two"><button class="btn" data-act="rates-save">ذخیره</button><button class="btn ghost" data-act="close">لغو</button></div>';
+  openSheet(h);
+}
+function openThemes() {
+  var h = '<h2 style="margin-bottom:10px">تغییر تم</h2><div class="themes">' + THEMES.map(function (x) {
+    return '<button data-act="theme-pick" data-id="' + x.id + '" class="' + (x.id === S.theme ? 'on' : '') + '"><div class="sw">' + x.c.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</div><b>' + x.name + '</b><div class="sub">' + x.d + '</div></button>';
+  }).join('') + '</div><button class="btn ghost wide" style="margin-top:12px" data-act="close">بستن</button>';
+  openSheet(h);
+}
+
+/* ---------- live rates ---------- */
+async function getJson(url) {
+  var ctl = new AbortController(), tm = setTimeout(function () { ctl.abort(); }, 8000);
+  try { var r = await fetch(url, { signal: ctl.signal, cache: 'no-store' }); return await r.json(); } finally { clearTimeout(tm); }
+}
+async function fetchRates(manual) {
+  var usd = 0, eur = 0;
+  try {
+    var j = await getJson('https://open.er-api.com/v6/latest/USD');
+    if (j && j.result === 'success' && j.rates && j.rates.TRY && j.rates.EUR) { usd = j.rates.TRY; eur = j.rates.TRY / j.rates.EUR; }
+  } catch (e) {}
+  if (!(usd > 0)) {
+    try {
+      var k = await getJson('https://api.frankfurter.app/latest?from=USD&to=TRY,EUR');
+      if (k && k.rates && k.rates.TRY && k.rates.EUR) { usd = k.rates.TRY; eur = k.rates.TRY / k.rates.EUR; }
+    } catch (e) {}
+  }
+  if (!(usd > 0) || !(eur > 0)) { if (manual) toast('نرخ از اینترنت گرفته نشد. دستی بزن.'); return false; }
+  S.rates = { USD: { v: Math.round(usd * 100) / 100, date: todayStr() }, EUR: { v: Math.round(eur * 100) / 100, date: todayStr() }, set: true, auto: true, at: Date.now() };
+  save(); if (manual) toast('نرخ‌ها به‌روز شد'); render(); return true;
+}
+function autoRates() {
+  if (!navigator.onLine) return;
+  var r = S.rates;
+  var stale = !r.at || Date.now() - r.at > 6 * 3600e3;
+  if (!r.set || (r.auto && stale) || (!r.auto && r.USD.date < todayStr())) fetchRates(false);
+}
+
+/* ---------- backup ---------- */
+function backupText() { return JSON.stringify(S, null, 1); }
+async function exportBackup() {
+  var name = 'goal-tracker-backup-' + todayStr() + '.json', text = backupText();
+  function done() { S.lastBackup = todayStr(); save(); toast('پشتیبان ذخیره شد'); render(); }
+  try {
+    var file = new File([text], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); done(); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  try {
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' })); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); done(); return;
+  } catch (e) {}
+  copyBackup(true);
+}
+async function copyBackup(fallback) {
+  try { await navigator.clipboard.writeText(backupText()); S.lastBackup = todayStr(); save(); toast(fallback ? 'ذخیره‌ی فایل ممکن نبود. متن پشتیبان کپی شد، تو Notes بچسبون.' : 'متن پشتیبان کپی شد'); render(); }
+  catch (e) { toast('کپی نشد. دوباره امتحان کن.'); }
+}
+function importApply() {
+  var err = $('imp-err'); err.hidden = true;
+  var txt = $('imp-text').value.trim(), f = $('imp-file').files && $('imp-file').files[0];
+  function apply(text) {
+    try {
+      var o = JSON.parse(text);
+      if (!o || !Array.isArray(o.goals) || !Array.isArray(o.receipts) || !o.rates) throw new Error('bad');
+      o.done = o.done || []; o.sources = o.sources || []; o.persons = o.persons || [];
+      S = o; save(); setTheme(S.theme || 'ice'); toast('پشتیبان بازیابی شد'); go('home');
+    } catch (e) { err.textContent = 'این فایل پشتیبان معتبر نیست.'; err.hidden = false; }
+  }
+  if (f) { var rd = new FileReader(); rd.onload = function () { apply(String(rd.result)); }; rd.readAsText(f); }
+  else if (txt) apply(txt);
+  else { err.textContent = 'اول فایل رو انتخاب کن یا متن رو بچسبون.'; err.hidden = false; }
+}
+
+/* ---------- events ---------- */
+var armed = null, armT = null;
+function twoStep(btn, fn) {
+  if (armed === btn) { clearTimeout(armT); armed = null; fn(); return; }
+  if (armed) { armed.textContent = armed.getAttribute('data-label'); }
+  btn.setAttribute('data-label', btn.textContent); btn.textContent = 'مطمئنی؟ دوباره بزن'; armed = btn;
+  clearTimeout(armT); armT = setTimeout(function () { if (armed) { armed.textContent = armed.getAttribute('data-label'); armed = null; } }, 4000);
+}
+function chipDue(n) {
+  var t = todayStr();
+  if (n === 'eom') { var d = parseYmd(t); return ymd(new Date(d.getFullYear(), d.getMonth() + 1, 0)); }
+  if (n === 'nm') { var d2 = parseYmd(t); return ymd(new Date(d2.getFullYear(), d2.getMonth() + 1, 1)); }
+  return addDays(t, parseInt(n, 10));
+}
+document.addEventListener('click', function (e) {
+  var go_ = e.target.closest('[data-go]');
+  if (go_) { go(go_.getAttribute('data-go')); return; }
+  var b = e.target.closest('[data-act]');
+  if (!b) return;
+  var a = b.getAttribute('data-act'), id = b.getAttribute('data-id');
+  if (a === 'close') closeSheet();
+  else if (a === 'undo') { if (undoFn) undoFn(); $('toast').hidden = true; undoFn = null; }
+  else if (a === 'mic') { var v = $('vc'); v.focus(); }
+  else if (a === 'example') { $('vc').value = b.getAttribute('data-t'); }
+  else if (a === 'parse') {
+    var txt = $('vc').value, err = $('vc-err');
+    if (!txt.trim()) { err.textContent = 'اول جمله رو بگو یا بنویس.'; err.hidden = false; return; }
+    var p = parseCommand(txt, S.sources, S.persons);
+    if (!p.ok && p.reason === 'start') { err.textContent = 'جمله باید با «دریافت» شروع بشه.'; err.hidden = false; return; }
+    err.hidden = true;
+    openReceipt({ amount: p.amount || '', cur: p.cur || S.lastCur || 'USD', source: p.source || S.sources[0] || '', sourceNew: !!p.sourceNew, person: p.person || '', personNew: !!p.personNew });
+  }
+  else if (a === 'manual') openReceipt();
+  else if (a === 'rc-save') rcSave();
+  else if (a === 'rc-edit') {
+    var r = S.receipts.filter(function (x) { return x.id === id; })[0];
+    if (r) openReceipt({ amount: r.amount, cur: r.cur, rate: r.rate, source: r.source, person: r.person, date: r.date, held: r.held }, r.id);
+  }
+  else if (a === 'rc-del') twoStep(b, function () { S.receipts = S.receipts.filter(function (x) { return x.id !== id; }); save(); toast('حذف شد'); render(); });
+  else if (a === 'rc-convert') {
+    var r2 = S.receipts.filter(function (x) { return x.id === id; })[0]; if (!r2) return;
+    openSheet('<h2 style="margin-bottom:8px">تبدیل کردم</h2><p class="sub" style="margin-bottom:10px">' + money(r2.amount, r2.cur) + ' با چه نرخی تبدیل شد؟</p><label class="field"><span>نرخ به لیر</span><input id="cv-rate" class="in num" inputmode="decimal" value="' + S.rates[r2.cur].v + '"></label><div id="cv-err" class="err" hidden></div><div class="two"><button class="btn" data-act="cv-save" data-id="' + id + '">تأیید</button><button class="btn ghost" data-act="close">لغو</button></div>');
+  }
+  else if (a === 'cv-save') {
+    var rate = num($('cv-rate').value), r3 = S.receipts.filter(function (x) { return x.id === id; })[0];
+    if (!(rate > 0)) { $('cv-err').textContent = 'نرخ رو بزن.'; $('cv-err').hidden = false; return; }
+    convertReceipt(r3, rate); save(); closeSheet(); toast('تبدیل ثبت شد'); render();
+  }
+  else if (a === 'goal-new') openGoal(null);
+  else if (a === 'goal-edit') openGoal(id);
+  else if (a === 'goal-save') goalSave();
+  else if (a === 'goal-del') twoStep(b, function () { S.goals = S.goals.filter(function (g) { return g.id !== id; }); save(); toast('هدف حذف شد'); render(); });
+  else if (a === 'g-name') { $('g-name').value = b.getAttribute('data-n'); }
+  else if (a === 'g-due') { $('g-due').value = chipDue(b.getAttribute('data-n')); }
+  else if (a === 'inst-done') {
+    var key = b.getAttribute('data-key'); S.done.push(key); save(); render();
+    toast('ثبت شد: پرداخت شد', function () { S.done = S.done.filter(function (k) { return k !== key; }); save(); render(); });
+  }
+  else if (a === 'apply-surplus') { applySurplus(S); save(); toast('مازاد روی هدف‌ها رفت'); render(); }
+  else if (a === 'rates') openRates();
+  else if (a === 'rates-save') {
+    var u = num($('r-usd').value), eu = num($('r-eur').value);
+    if (!(u > 0) || !(eu > 0)) { $('r-err').textContent = 'هر دو نرخ رو بزن.'; $('r-err').hidden = false; return; }
+    S.rates = { USD: { v: u, date: todayStr() }, EUR: { v: eu, date: todayStr() }, set: true, auto: false, at: Date.now() };
+    save(); closeSheet(); toast('نرخ‌ها ذخیره شد'); render();
+  }
+  else if (a === 'rates-fetch') { fetchRates(true).then(function (ok) { if (ok && $('r-usd')) { $('r-usd').value = S.rates.USD.v; $('r-eur').value = S.rates.EUR.v; } }); }
+  else if (a === 'themes') openThemes();
+  else if (a === 'theme-pick') { setTheme(id); save(); openThemes(); render(); }
+  else if (a === 'backup-export') exportBackup();
+  else if (a === 'backup-copy') copyBackup(false);
+  else if (a === 'import-apply') twoStep(b, importApply);
+  else if (a === 'reset-all') twoStep(b, function () { var th = S.theme, rt = S.rates; S = { v: 1, demo: false, theme: th, lastBackup: null, lastCur: 'USD', rates: rt, sources: ['پورسانت', 'کمیسیون', 'فروش', 'واسطه‌گری'], persons: [], goals: [], receipts: [], done: [] }; save(); toast('همه چیز پاک شد'); go('home'); });
+  else if (a === 'demo-clear') twoStep(b, function () { S.goals = []; S.receipts = []; S.done = []; S.persons = []; S.demo = false; save(); toast('نمونه‌ها پاک شد'); render(); });
+  else if (a === 'list-add') {
+    var kind = b.getAttribute('data-kind'), inp = $('add-' + kind), val = normName(inp.value);
+    if (val && S[kind].indexOf(val) === -1) { S[kind].push(val); save(); render(); }
+  }
+  else if (a === 'list-del') { var k = b.getAttribute('data-kind'), i = parseInt(b.getAttribute('data-i'), 10); twoStep(b, function () { S[k].splice(i, 1); save(); render(); }); }
+});
+$('sheet').addEventListener('input', function (e) { if (rc && e.target.id && e.target.id.indexOf('rc-') === 0) rcPrev(); });
+$('sheet').addEventListener('change', function (e) {
+  if (e.target.id === 'g-type') goType();
+  else if (rc && e.target.id && e.target.id.indexOf('rc-') === 0) {
+    if (e.target.id === 'rc-cur') { var c = e.target.value; if (c !== 'TRY') $('rc-rate').value = S.rates[c].v; }
+    rcPrev();
+  }
+});
+render();
+autoRates();
+if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
+})();
+</script>
+</body></html>
